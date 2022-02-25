@@ -7,3 +7,10 @@ Jason Steffener
 Team members:
 Matthew Tran 300028206
 Alexandre Latimer 300027473
+
+Tasks completed: 
+
+Input file: 
+  *Input generic setup file (Matt)
+  *Data to be used (CSV) (Alex)
+  *Additional parameters (Alex and Matt)
