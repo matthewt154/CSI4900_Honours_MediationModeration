@@ -11,6 +11,7 @@ from msilib.schema import Error
 import nibabel as nb 
 import pandas as pd
 import numpy as np
+import re
 
 '''
 Deliverable 1
@@ -19,18 +20,85 @@ Alex Data to be used (CSV stuff)
 Parameters - Matt (first 2) Alex (last 2)
 ''' 
 
+#--------functions given to read data ----------------- 
+def load_img_data(path):
+    """ Returns NIfTI brain image as a 4-D numpy array.
+    Keyword arguments:
+    path -- the path of the NIfTI file    
+    """
+    nii_img = nib.load(path)
+    return nii_img.get_fdata()
+
+def create_mask(img_data):
+    """Returns image data where the voxels values are 0 or 1 based on if they are nan or not.
+    Keyword arguments:
+    img_data -- Loaded brain imaging data
+    """
+    return np.where(np.isnan(img_data), 0, 1)
+
+def create_brain_data(img_data, mask):
+    """Returns n by m sized brain imaging data.
+    Keyword arguments:
+    img_data -- Loaded brain imaging data
+    mask -- Loaded brain imaging data that represents a mask
+    """
+    # Check if the mask and img_data are the same size later
+    brain_data = []
+    for i in range(img_data.shape[3]):
+        p = np.multiply(img_data[:,:,:,i], mask)
+        pf = p.flatten()
+        pfn = pf[np.logical_not(np.isnan(pf))]
+        brain_data.append(pfn)
+    return np.array(brain_data)
+
+#------------------------------------
+
 #function to check the setup file for the number of variables used  
+
+'''
+Graph LR;
+A --> C;
+A --> B --> C;
+
+'''
+
+#check number of variables in setup file
 def check_setup(setup_name):
-	num_var=3
-	#some code to check the file and count variables ...
+	f = open("Data/" +setup_name+".txt", "r")
+	s = f.readline()
+	print(s)
+	content = s[s.find("[")+1:s.find("]")]
+	print(content)
+	
+	num_var=0
+	for c in content:
+		if c.isalpha():
+			num_var+=1
 	return num_var
 
 def confidence_interval_menu (bootstrap_num):
-	#code to output a menu to select confidence intervals for a certain bootstrap number 
-	return
+	print("What type of confidence intervals would you like to use?")
+	
+	confidence_interval_type = input("1.Percentile (PE) \n 2.Bias-Corrected (BC)")
+	# Selection from a menu/list * Percentile, Bias-Corrected
+	return confidence_interval_type
 
-setup_name = input ("Please enter the name of the Model Setup File (make sure it's in the same directory")
+def write_output(filename, param_name, content):
+	f = open(filename, "a")
+	f.write(param_name + ": "+content)
+	f.close()
+
+# ============== User inputs =====================
+
+#write output to a file
+
+model_num = input ("What model number is this?")
+out_name = "parameters_model"+string(model_num)+".txt"
+final_out = open(out_name, "x") #create file
+
+setup_name = input ("Please enter the name of the Model Setup File (make sure it's in the 'Data' directory")
 model_variables = check_setup(setup_name)
+write_output(final_out, "No. variables", model_variables)
 
 # Data selection
 try:
@@ -53,10 +121,15 @@ data_output.to_csv('data_output.csv', index=False)
 
 #User parameters 
 bootstrap_num = input("How many bootstraps (default 1000) do you want to include?")
+write_output(final_out, "Bootstraps", bootstrap_num)
 
-confidence_interval_menu(bootstrap_num)
+confidence_type= confidence_interval_menu(bootstrap_num)
+write_output(final_out, "Confidence interval type", confidence_type)
 
 TFCE = input ("Do you want to apply TFCE (Y/N)")
+write_output(final_out, "TFCE", TFCE)
+
+
 
 
 
