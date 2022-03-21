@@ -7,10 +7,11 @@
 	-Alexandre Latimer 300027473
 
 '''
-from msilib.schema import Error
-import nibabel as nb 
-import pandas as pd
+import json
+import nibabel as nib 
 import numpy as np
+from msilib.schema import Error
+import pandas as pd
 import re
 
 '''
@@ -83,6 +84,12 @@ def confidence_interval_menu (bootstrap_num):
 	# Selection from a menu/list * Percentile, Bias-Corrected
 	return confidence_interval_type
 
+def correction_menu():
+    '''Menu for what correction for multiple comparisons to use'''
+    print("Correction for multiple comparisons to use:")
+    correction_type = input("1 - None\n2 - Family-wise\n3 - False-discovery\n")
+    return correction_type
+
 def write_output(filename, param_name, content):
 	f = open(filename, "a")
 	f.write(param_name + ": "+content)
@@ -92,13 +99,13 @@ def write_output(filename, param_name, content):
 
 #write output to a file
 
-model_num = input ("What model number is this?")
-out_name = "parameters_model"+string(model_num)+".txt"
-final_out = open(out_name, "x") #create file
+###model_num = input ("What model number is this?")
+###out_name = "parameters_model"+str(model_num)+".txt"
+###final_out = open(out_name, "x") #create file
 
-setup_name = input ("Please enter the name of the Model Setup File (make sure it's in the 'Data' directory")
+setup_name = input ("Please enter the name of the Model Setup File (make sure it's in the 'Data' directory): ")
 model_variables = check_setup(setup_name)
-write_output(final_out, "No. variables", model_variables)
+###write_output(final_out, "No. variables", model_variables)
 
 # Data selection
 try:
@@ -121,15 +128,25 @@ data_output.to_csv('data_output.csv', index=False)
 
 #User parameters 
 bootstrap_num = input("How many bootstraps (default 1000) do you want to include?")
-write_output(final_out, "Bootstraps", bootstrap_num)
+###write_output(final_out, "Bootstraps", bootstrap_num)
 
 confidence_type= confidence_interval_menu(bootstrap_num)
-write_output(final_out, "Confidence interval type", confidence_type)
+###write_output(final_out, "Confidence interval type", confidence_type)
 
 TFCE = input ("Do you want to apply TFCE (Y/N)")
-write_output(final_out, "TFCE", TFCE)
+###write_output(final_out, "TFCE", TFCE)
 
+correction_type = correction_menu()
 
+#--------------- Output Analysis to JSON file ---------------
 
+analysis_dict = {}
+analysis_dict["Bootstrap"] = bootstrap_num
+analysis_dict["Confidence_Interval"] = confidence_type
+analysis_dict["TFCE"] = TFCE
+analysis_dict["Correction_Type"] = correction_type
 
-
+analysisString = json.dumps(analysis_dict)
+jsonFile = open("analysis_output.json", "w")
+jsonFile.write(analysisString)
+jsonFile.close()
