@@ -1,0 +1,29 @@
+{
+    "ModelName": "Model 4", 
+    "Direct": [["A", "B", "C"], [0,0,0], [1,0,0], [1,1,0]],
+    "Interaction": [["A", "B", "C"], [0,0,0], [0,0,0], [0,0,0]],
+    "Path":[["A", "B", "C"], [0,0,0], [1,0,0], [0,2,0]],
+
+    "Variables": {
+        "A": {
+            "data_type": "csv",
+            "filepath": "C:/filepath",
+            "column": "Age"
+        },
+        "B": {
+            "data_type": "brain image data",
+            "filepath": "C:/filepath"
+        },
+        "C": {
+            "data_type": "maskless brain image data",
+            "filepath": "C:/filepath",
+            "mask": "C:/filepath"
+        }
+
+    },
+
+    "Bootstrap": "500", 
+    "Confidence_Interval": "PE", 
+    "TFCE": "Y", 
+    "Correction_Type": "None"
+}
