@@ -15,8 +15,8 @@ class SetupController:
         self._view = view
 
         ### Temporary
-        self._view.variableNums.currentIndexChanged.connect(self._view.variablesLayout.setCurrentIndex)
-        self._view.first.csvInputBtn.clicked.connect(self.getFile)
+        ###self._view.variableNums.currentIndexChanged.connect(self._view.variablesLayout.setCurrentIndex)
+        ###self._view.first.csvInputBtn.clicked.connect(self.getFile)
 
         # Connect Paramaters
         self._view.bootstraps.textChanged.connect(partial(self._model._updateParamaters, "Bootstraps"))

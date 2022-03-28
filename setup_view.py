@@ -1,3 +1,4 @@
+import string
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QGridLayout, QStackedLayout
 from PyQt5.QtWidgets import QLineEdit
@@ -27,27 +28,30 @@ class SetupView(QMainWindow):
         self.setCentralWidget(self._centralWidget)
         self._centralWidget.setLayout(self.mainLayout)
 
-        # Temporary place holder of datafile picker
-        #TODO
-        self.variableNums = QComboBox()
-        self.variableNums.addItems(["csv","brain image data (maskless)","brain image data (with mask)"])
-        self.mainLayout.addWidget(self.variableNums)
+        #TODO: Link up to Model's variables + functionality
+        variableNames = ["A", "B", "C", "D"]
 
-        self._setVariables()
+        self._setVariables(variableNames)
 
         self._setParameters()
 
         self._setAnalysisButton()
 
-    def _setVariables(self):
+    def _setVariables(self, variableNameList):
         """Set Variables UI"""
-        self.variablesLayout = QStackedLayout()
-        self.first = csvInput()
-        self.second = QPushButton("maskless")
-        self.third = QPushButton("mask")
-        self.variablesLayout.addWidget(self.first)
-        self.variablesLayout.addWidget(self.second)
-        self.variablesLayout.addWidget(self.third)
+        # Create variables layout
+        self.variablesLayout = QVBoxLayout()
+        self.variablesLabel = QLabel("Variables")
+        font = QFont()
+        font.setBold(True)
+        self.variablesLabel.setFont(font)
+        self.variablesLayout.addWidget(self.variablesLabel)
+
+        # Create variable inputs for each variable
+        self.variables = {}
+        for var in variableNameList:
+            self.variables[var] = VariableInput(var)
+            self.variablesLayout.addWidget(self.variables[var])
 
         self.mainLayout.addLayout(self.variablesLayout)
 
@@ -106,7 +110,7 @@ class SetupView(QMainWindow):
         self.mainLayout.addWidget(self.analysisBtn)
 
 
-class csvInput(QWidget):
+class CsvInput(QWidget):
     """Custom widget for csv data"""
     def __init__(self):
         super().__init__()
@@ -118,6 +122,8 @@ class csvInput(QWidget):
         self.csvInput = QLineEdit()
         self.csvInput.setReadOnly(True)
         self.csvInputBtn = QPushButton("Get File")
+        self.columnLabel = QLabel("Column: ")
+        self.csvInputColumn = QComboBox()
 
 
         #self.csvInputBtn.clicked.connect(self.getFile)
@@ -125,3 +131,86 @@ class csvInput(QWidget):
         self.csvLayout.addWidget(self.variableLabel, 0, 0)
         self.csvLayout.addWidget(self.csvInput, 0, 1)
         self.csvLayout.addWidget(self.csvInputBtn, 0, 2)
+        self.csvLayout.addWidget(self.columnLabel, 1, 0)
+        self.csvLayout.addWidget(self.csvInputColumn, 1, 1)
+
+class BrainImageInput(QWidget):
+    """Custom widget for maskless brain image data"""
+    def __init__(self):
+        super().__init__()
+        
+        self.brainImageLayout = QGridLayout()
+        self.setLayout(self.brainImageLayout)
+
+        self.variableLabel = QLabel("Brain Image File Path: ")
+        self.brainImageInput = QLineEdit()
+        self.brainImageInput.setReadOnly(True)
+        self.brainImageInputBtn = QPushButton("Get File")
+
+
+        #self.csvInputBtn.clicked.connect(self.getFile)
+
+        self.brainImageLayout.addWidget(self.variableLabel, 0, 0)
+        self.brainImageLayout.addWidget(self.brainImageInput, 0, 1)
+        self.brainImageLayout.addWidget(self.brainImageInputBtn, 0, 2)
+
+class BrainImageMaskInput(QWidget):
+    """Custom widget for brain image data with mask"""
+    def __init__(self):
+        super().__init__()
+        
+        self.brainImageLayout = QGridLayout()
+        self.setLayout(self.brainImageLayout)
+
+        self.variableLabel = QLabel("Brain Image File Path: ")
+        self.brainImageInput = QLineEdit()
+        self.brainImageInput.setReadOnly(True)
+        self.brainImageInputBtn = QPushButton("Get File")
+        self.maskLabel = QLabel("Mask File Path: ")
+        self.maskInput = QLineEdit()
+        self.maskInput.setReadOnly(True)
+        self.maskInputBtn = QPushButton("Get File")
+
+
+        #self.csvInputBtn.clicked.connect(self.getFile)
+
+        self.brainImageLayout.addWidget(self.variableLabel, 0, 0)
+        self.brainImageLayout.addWidget(self.brainImageInput, 0, 1)
+        self.brainImageLayout.addWidget(self.brainImageInputBtn, 0, 2)
+        self.brainImageLayout.addWidget(self.maskLabel, 1, 0)
+        self.brainImageLayout.addWidget(self.maskInput, 1, 1)
+        self.brainImageLayout.addWidget(self.maskInputBtn, 1, 2)
+
+class VariableInput(QWidget):
+
+    variableName = ""   #Variable name
+
+    def __init__(self, vname):
+        super().__init__()
+
+        variableName = vname
+
+        self.variableInputLayout = QVBoxLayout()
+
+        self.variablesLabel = QLabel("Variable " + variableName)
+        self.variableInputLayout.addWidget(self.variablesLabel)
+
+
+        self.variableNums = QComboBox()
+        self.variableNums.addItems(["csv","brain image data (maskless)","brain image data (with mask)"])
+        self.variableInputLayout.addWidget(self.variableNums)
+        self.setLayout(self.variableInputLayout)
+
+        self.variablesLayout = QStackedLayout()
+
+        self.csv = CsvInput()
+        self.brainImageData = BrainImageInput()
+        self.brainImageMaskData = BrainImageMaskInput()
+
+        self.variablesLayout.addWidget(self.csv)
+        self.variablesLayout.addWidget(self.brainImageData)
+        self.variablesLayout.addWidget(self.brainImageMaskData)
+
+        self.variableInputLayout.addLayout(self.variablesLayout)
+
+        self.variableNums.currentIndexChanged.connect(self.variablesLayout.setCurrentIndex)
