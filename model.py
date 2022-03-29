@@ -14,7 +14,7 @@ from PyQt5.QtWidgets import QLabel
 
 # import view (GUI), model and controller
 import model_view
-#import model_in
+#import model_input
 import model_controller
 
 def main():
@@ -25,7 +25,8 @@ def main():
     view = model_view.ModelView()
     view.show()
     #Get Model (?)
-
+    #model = model_input.ModelInput()
+    
     # Get controller
     model_controller.ModelController(view=view)
     # Execute the model gui main loop

@@ -1,15 +1,11 @@
-import re
-def check_setup(setup_name):
-	f = open("Data/" +setup_name+".txt", "r")
-	s = f.readline()
-	print(s)
-	content = s[s.find("[")+1:s.find("]")]
-	print(content)
-	
-	num_var=0
-	for c in content:
-		if c.isalpha():
-			num_var+=1
-	return num_var
+import json
 
-print (check_setup("setup_4"))
+def check_setup(setup_name):
+	with open(setup_name, 'r') as f:
+  		data = json.load(f)
+
+	s = data["Direct"]
+	
+	return len(s[0])
+
+print (check_setup("Data/model4_setup.json"))

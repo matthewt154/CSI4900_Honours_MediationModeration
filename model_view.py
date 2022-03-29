@@ -21,7 +21,7 @@ class ModelView(QMainWindow):
         super().__init__()
         # Set some main window's properties
         self.setWindowTitle('Analysis Model')
-        self.setFixedSize(600, 600)
+        self.setFixedSize(1000, 400)
         # Set the central widget and the main layout
         self.mainLayout = QVBoxLayout()
         self._centralWidget = QWidget(self)
@@ -32,15 +32,17 @@ class ModelView(QMainWindow):
 
         self._setSetupInput() #just ask for setup file path
 
-        numberOfVariables = self._getNumberOfVariables()
-        variableNames = self._getVariableNames()
+        '''numberOfVariables = self._getNumberOfVariables()
+        variableNames = self._getVariableNames()'''
+
+        self._setSubmitButton()
 
         '''
         self._setVariables(variableNames)
 
         self._setParameters()
 
-        self._setAnalysisButton()
+        
         '''
 
     
@@ -53,33 +55,25 @@ class ModelView(QMainWindow):
         font.setBold(True)
         self.setupLabel.setFont(font)
         self.setupLayout.addWidget(self.setupLabel)
-        
+
+        description1 = "Choose a json setup file and click submit. "
+        description2 = "This will bring you to the variable selection page with the number of variables and their names already separated."        
+        self.description1Label = QLabel(description1)
+        self.setupLayout.addWidget(self.description1Label)
+        self.description2Label = QLabel(description2)
+        self.setupLayout.addWidget(self.description2Label)
+
         self.setup = SetupFileInput()
         self.setupLayout.addWidget(self.setup)
 
         self.mainLayout.addLayout(self.setupLayout)
 
+    def _setSubmitButton(self):
+        """Set Submit Button"""
+        self.submitBtn = QPushButton("Submit")
+        self.mainLayout.addWidget(self.submitBtn)
+
     
-
-    def _getNumberOfVariables(self): 
-        #TODO modify for json file
-        '''
-        f = open("Data/" +setup_name+".txt", "r")
-        s = f.readline()
-        print(s)
-        content = s[s.find("[")+1:s.find("]")]
-        print(content)
-        
-        num_var=0
-        for c in content:
-            if c.isalpha():
-                num_var+=1
-        return num_var
-    '''
-        return 0
-
-    def _getVariableNames(self):
-        return 0 
 
 class SetupFileInput(QWidget):
         setup_file_name = ""   #SetupFile name

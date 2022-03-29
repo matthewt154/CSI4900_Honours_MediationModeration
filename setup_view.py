@@ -21,7 +21,7 @@ class SetupView(QMainWindow):
         super().__init__()
         # Set some main window's properties
         self.setWindowTitle('Analysis Setup')
-        self.setFixedSize(600, 1000)
+        self.setFixedSize(1000, 1000)
         # Set the central widget and the main layout
         self.mainLayout = QVBoxLayout()
         self._centralWidget = QWidget(self)

@@ -27,12 +27,12 @@ class ModelController:
         self._view.analysisBtn.clicked.connect(self._model._createAnalysisFile)
         '''
     def getFile(self):
-        file_filter = 'Data File (*.csv)'
+        file_filter = 'Data File (*.json)'
         response = QFileDialog.getOpenFileName(
             parent=self,
             caption='Select a data file',
             directory=os.getcwd(),
             filter=file_filter,
-            initialFilter='Data File (*.csv)'
+            initialFilter='Data File (*.json)'
         )
         print(response)
