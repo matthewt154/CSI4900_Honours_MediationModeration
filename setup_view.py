@@ -13,6 +13,9 @@ from PyQt5.QtWidgets import QFileDialog
 from PyQt5.QtGui import QIntValidator, QFont
 
 import os
+import json
+
+from VariableInput import VariableInput
 
 class SetupView(QMainWindow):
     """Analysis Setup View class (GUI)"""
@@ -108,109 +111,23 @@ class SetupView(QMainWindow):
         """Set Analysis Button"""
         self.analysisBtn = QPushButton("Create Analysis File")
         self.mainLayout.addWidget(self.analysisBtn)
+        self.analysisBtn.clicked.connect(self.createAnalysisFile)
 
+    def createAnalysisFile(self):
+        analysis_dict = {}
 
-class CsvInput(QWidget):
-    """Custom widget for csv data"""
-    def __init__(self):
-        super().__init__()
-        
-        self.csvLayout = QGridLayout()
-        self.setLayout(self.csvLayout)
+        var_array = []
+        for var in self.variables:
+            print(self.variables[var].getCurrentVariable())
+            var_array.append(self.variables[var].getCurrentVariable())
 
-        self.variableLabel = QLabel("Csv File Path: ")
-        self.csvInput = QLineEdit()
-        self.csvInput.setReadOnly(True)
-        self.csvInputBtn = QPushButton("Get File")
-        self.columnLabel = QLabel("Column: ")
-        self.csvInputColumn = QComboBox()
+        analysis_dict["Variables"] = var_array
+        analysis_dict["Bootstrap"] = str(self.bootstraps.text())
+        analysis_dict["Confidence_Interval"] = str(self.confidenceInterval.currentText())
+        analysis_dict["TFCE"] = str(self.tcfe.currentText())
+        analysis_dict["Correction_Type"] = str(self.comparisons.currentText())
 
-
-        #self.csvInputBtn.clicked.connect(self.getFile)
-
-        self.csvLayout.addWidget(self.variableLabel, 0, 0)
-        self.csvLayout.addWidget(self.csvInput, 0, 1)
-        self.csvLayout.addWidget(self.csvInputBtn, 0, 2)
-        self.csvLayout.addWidget(self.columnLabel, 1, 0)
-        self.csvLayout.addWidget(self.csvInputColumn, 1, 1)
-
-class BrainImageInput(QWidget):
-    """Custom widget for maskless brain image data"""
-    def __init__(self):
-        super().__init__()
-        
-        self.brainImageLayout = QGridLayout()
-        self.setLayout(self.brainImageLayout)
-
-        self.variableLabel = QLabel("Brain Image File Path: ")
-        self.brainImageInput = QLineEdit()
-        self.brainImageInput.setReadOnly(True)
-        self.brainImageInputBtn = QPushButton("Get File")
-
-
-        #self.csvInputBtn.clicked.connect(self.getFile)
-
-        self.brainImageLayout.addWidget(self.variableLabel, 0, 0)
-        self.brainImageLayout.addWidget(self.brainImageInput, 0, 1)
-        self.brainImageLayout.addWidget(self.brainImageInputBtn, 0, 2)
-
-class BrainImageMaskInput(QWidget):
-    """Custom widget for brain image data with mask"""
-    def __init__(self):
-        super().__init__()
-        
-        self.brainImageLayout = QGridLayout()
-        self.setLayout(self.brainImageLayout)
-
-        self.variableLabel = QLabel("Brain Image File Path: ")
-        self.brainImageInput = QLineEdit()
-        self.brainImageInput.setReadOnly(True)
-        self.brainImageInputBtn = QPushButton("Get File")
-        self.maskLabel = QLabel("Mask File Path: ")
-        self.maskInput = QLineEdit()
-        self.maskInput.setReadOnly(True)
-        self.maskInputBtn = QPushButton("Get File")
-
-
-        #self.csvInputBtn.clicked.connect(self.getFile)
-
-        self.brainImageLayout.addWidget(self.variableLabel, 0, 0)
-        self.brainImageLayout.addWidget(self.brainImageInput, 0, 1)
-        self.brainImageLayout.addWidget(self.brainImageInputBtn, 0, 2)
-        self.brainImageLayout.addWidget(self.maskLabel, 1, 0)
-        self.brainImageLayout.addWidget(self.maskInput, 1, 1)
-        self.brainImageLayout.addWidget(self.maskInputBtn, 1, 2)
-
-class VariableInput(QWidget):
-
-    variableName = ""   #Variable name
-
-    def __init__(self, vname):
-        super().__init__()
-
-        variableName = vname
-
-        self.variableInputLayout = QVBoxLayout()
-
-        self.variablesLabel = QLabel("Variable " + variableName)
-        self.variableInputLayout.addWidget(self.variablesLabel)
-
-
-        self.variableNums = QComboBox()
-        self.variableNums.addItems(["csv","brain image data (maskless)","brain image data (with mask)"])
-        self.variableInputLayout.addWidget(self.variableNums)
-        self.setLayout(self.variableInputLayout)
-
-        self.variablesLayout = QStackedLayout()
-
-        self.csv = CsvInput()
-        self.brainImageData = BrainImageInput()
-        self.brainImageMaskData = BrainImageMaskInput()
-
-        self.variablesLayout.addWidget(self.csv)
-        self.variablesLayout.addWidget(self.brainImageData)
-        self.variablesLayout.addWidget(self.brainImageMaskData)
-
-        self.variableInputLayout.addLayout(self.variablesLayout)
-
-        self.variableNums.currentIndexChanged.connect(self.variablesLayout.setCurrentIndex)
+        analysisString = json.dumps(analysis_dict)
+        jsonFile = open("analysis_output.json", "w")
+        jsonFile.write(analysisString)
+        jsonFile.close()
