@@ -13,6 +13,7 @@ from PyQt5.QtWidgets import QFileDialog
 from PyQt5.QtGui import QIntValidator, QFont
 
 import os
+import main
 
 class SetupView(QMainWindow):
     """Analysis Setup View class (GUI)"""
@@ -28,10 +29,12 @@ class SetupView(QMainWindow):
         self.setCentralWidget(self._centralWidget)
         self._centralWidget.setLayout(self.mainLayout)
 
+        self.mainlink = main.ModelSelect()
         #TODO: Link up to Model's variables + functionality
-        variableNames = ["A", "B", "C", "D"]
-
-        self._setVariables(variableNames)
+        self.variableNames = self.mainlink.getModelVariables() #["A", "B", "C", "D"]
+        
+        print("Variable names: "+str(self.variableNames))
+        self._setVariables(self.variableNames)
 
         self._setParameters()
 
@@ -108,6 +111,9 @@ class SetupView(QMainWindow):
         """Set Analysis Button"""
         self.analysisBtn = QPushButton("Create Analysis File")
         self.mainLayout.addWidget(self.analysisBtn)
+    
+    def setModelVariables(self, data: dict):
+        self.variableNames = data["name_variables"]
 
 
 class CsvInput(QWidget):
