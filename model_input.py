@@ -18,7 +18,7 @@ class ModelInput():
         self.analysis_dict["TCFE"] = "No"
         self.analysis_dict["Correction_Type"] = "None"
 
-    def _getNumberOfVariables(self, setup_name): 
+    '''def _getNumberOfVariables(self, setup_name): 
         with open(setup_name, 'r') as f:
             data = json.load(f)
 
@@ -37,7 +37,7 @@ class ModelInput():
     def _getModelName(self, setup_name):
         with open(setup_name, 'r') as f:
             data = json.load(f)
-        return data["ModelName"]
+        return data["ModelName"]'''
 
     
     '''def _updateParamaters(self, key, value):
