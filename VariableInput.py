@@ -16,6 +16,10 @@ import pandas as pd
 import os
 from functools import partial
 
+from CsvInput import CsvInput
+from BrainImageInput import BrainImageInput
+from BrainImageMaskInput import BrainImageMaskInput
+
 class VariableInput(QWidget):
 
     def __init__(self, vname):
@@ -67,10 +71,13 @@ class VariableInput(QWidget):
                 "filepath": self.brainImageMaskData.getFilepath(),
                 "mask_filepath": self.brainImageMaskData.getMaskFilepath()}
 
-class CsvInput(QWidget):
+
+class CsvInput2(QWidget):
     """Custom widget for csv data"""
     def __init__(self):
         super().__init__()
+
+        self.setFixedHeight(100)
         
         self.csvLayout = QGridLayout()
         self.setLayout(self.csvLayout)
@@ -115,15 +122,19 @@ class CsvInput(QWidget):
                 print("File '%s' could not be found" % e.filename)
     
     def getFilepath(self):
+        '''Return data filepath string'''
         return str(self.csvInput.text())
     
     def getColumn(self):
+        '''Return selected data column string'''
         return str(self.csvInputColumn.currentText())
 
-class BrainImageInput(QWidget):
+class BrainImageInput2(QWidget):
     """Custom widget for maskless brain image data"""
     def __init__(self):
         super().__init__()
+        
+        self.setFixedHeight(100)
         
         self.brainImageLayout = QGridLayout()
         self.setLayout(self.brainImageLayout)
@@ -158,12 +169,15 @@ class BrainImageInput(QWidget):
                 print("File '%s' could not be found" % e.filename)
     
     def getFilepath(self):
+        '''Return data filepath string'''
         return str(self.brainImageInput.text())
 
-class BrainImageMaskInput(QWidget):
+class BrainImageMaskInput2(QWidget):
     """Custom widget for brain image data with mask"""
     def __init__(self):
         super().__init__()
+
+        self.setFixedHeight(100)
         
         self.brainImageLayout = QGridLayout()
         self.setLayout(self.brainImageLayout)
@@ -206,8 +220,10 @@ class BrainImageMaskInput(QWidget):
                 print("File '%s' could not be found" % e.filename)
     
     def getFilepath(self):
+        '''Return data filepath string'''
         return str(self.brainImageInput.text())
     
     def getMaskFilepath(self):
+        '''Return mask filepath string'''
         return str(self.maskInput.text())
 

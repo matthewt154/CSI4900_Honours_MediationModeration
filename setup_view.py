@@ -10,6 +10,7 @@ from PyQt5.QtWidgets import QWidget
 from PyQt5.QtWidgets import QComboBox
 from PyQt5.QtWidgets import QLabel
 from PyQt5.QtWidgets import QFileDialog
+from PyQt5.QtWidgets import QScrollArea
 from PyQt5.QtGui import QIntValidator, QFont
 
 import os
@@ -24,7 +25,7 @@ class SetupView(QMainWindow):
         super().__init__()
         # Set some main window's properties
         self.setWindowTitle('Analysis Setup')
-        self.setFixedSize(600, 1000)
+        self.setFixedSize(600, 900)
         # Set the central widget and the main layout
         self.mainLayout = QVBoxLayout()
         self._centralWidget = QWidget(self)
@@ -50,11 +51,21 @@ class SetupView(QMainWindow):
         self.variablesLabel.setFont(font)
         self.variablesLayout.addWidget(self.variablesLabel)
 
+        # Add the Scrollable Area
+        self.scroll = QScrollArea()
+        self.variablesLayout.addWidget(self.scroll)
+        self.scroll.setWidgetResizable(True)
+        self.scrollContent = QWidget(self.scroll)
+        # Add set Layout to Scrollable Area
+        scrollLayout = QVBoxLayout(self.scrollContent)
+        self.scrollContent.setLayout(scrollLayout)
+
         # Create variable inputs for each variable
         self.variables = {}
         for var in variableNameList:
             self.variables[var] = VariableInput(var)
-            self.variablesLayout.addWidget(self.variables[var])
+            scrollLayout.addWidget(self.variables[var])
+            self.scroll.setWidget(self.scrollContent)
 
         self.mainLayout.addLayout(self.variablesLayout)
 
