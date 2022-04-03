@@ -13,7 +13,7 @@ from PyQt5.QtWidgets import QFileDialog
 from PyQt5.QtGui import QIntValidator, QFont
 
 import os
-import main
+#import main
 
 class SetupView(QMainWindow):
     """Analysis Setup View class (GUI)"""
@@ -29,16 +29,39 @@ class SetupView(QMainWindow):
         self.setCentralWidget(self._centralWidget)
         self._centralWidget.setLayout(self.mainLayout)
 
-        self.mainlink = main.ModelSelect()
+        #self.mainlink = main.ModelSelect()
         #TODO: Link up to Model's variables + functionality
-        self.variableNames = self.mainlink.getModelVariables() #["A", "B", "C", "D"]
+        #self.variableNames = self.mainlink.getModelVariables() #["A", "B", "C", "D"]
+        #self.variableNames = ["A", "B", "C", "D"]
         
-        print("Variable names: "+str(self.variableNames))
-        self._setVariables(self.variableNames)
+        #print("Variable names: "+str(self.variableNames))
+        #self._setVariables(self.variableNames)
+        self.NEW_setVariables()
 
         self._setParameters()
 
         self._setAnalysisButton()
+
+    def setVariables(self, vnameList):
+        self.variables = {}
+        for var in vnameList:
+            self.variables[var] = VariableInput(var)
+            self.variablesLayout.addWidget(self.variables[var])
+
+    def NEW_setVariables(self):
+        """Set Variables UI"""
+        # Create variables layout
+        self.variablesLayout = QVBoxLayout()
+        self.variablesLabel = QLabel("Variables")
+        font = QFont()
+        font.setBold(True)
+        self.variablesLabel.setFont(font)
+        self.variablesLayout.addWidget(self.variablesLabel)
+
+        # Create variables dict
+        self.variables = {}
+
+        self.mainLayout.addLayout(self.variablesLayout)
 
     def _setVariables(self, variableNameList):
         """Set Variables UI"""

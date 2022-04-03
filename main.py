@@ -28,142 +28,8 @@ import setup_view
 #import model_input
 import model_controller
 
-class PageWindow(QtWidgets.QMainWindow):
-    gotoSignal = QtCore.pyqtSignal(str)
-
-    def goto(self, name):
-        self.gotoSignal.emit(name)
-
-
-class ModelSelect(PageWindow):
-
-    
-
-    def __init__(self):
-        super().__init__()
-        self.initUI()
-        self.setWindowTitle("Model Selection")
-
-    def initUI(self):
-        self.UiComponents()
-
-    def UiComponents(self):
-        """Main Model selection function"""
-        # Create an instance of QApplication
-        #model = QApplication(sys.argv)
-        # Get and Show the view's GUI
-        """Analysis Model View class (GUI)"""
-        # Set some main window's properties
-        self.setWindowTitle('Analysis Model')
-        self.setFixedSize(1000, 400)
-        # Set the central widget and the main layout
-        self.mainLayout = QVBoxLayout()
-        self._centralWidget = QWidget(self)
-        self.setCentralWidget(self._centralWidget)
-        self._centralWidget.setLayout(self.mainLayout)
-
-
-        self._setSetupInput() #just ask for setup file path
-
-        # Execute the model gui main loop
-        #sys.exit(model.exec_())
-       
-    
-    def _setSetupInput(self):
-        """Set Setup UI"""
-        # Create setup layout
-        self.setupLayout = QVBoxLayout()
-        self.setupLabel = QLabel("Setup file")
-        font = QFont()
-        font.setBold(True)
-        self.setupLabel.setFont(font)
-        self.setupLayout.addWidget(self.setupLabel)
-
-        description1 = "Choose a json setup file and click submit. "
-        description2 = "This will bring you to the variable selection page with the number of variables and their names already separated."        
-        self.description1Label = QLabel(description1)
-        self.setupLayout.addWidget(self.description1Label)
-        self.description2Label = QLabel(description2)
-        self.setupLayout.addWidget(self.description2Label)
-
-    
-        self.setup = SetupFileInput()
-        self.setupLayout.addWidget(self.setup)
-
-        self.submitBtn = QtWidgets.QPushButton("Submit", self)
-        self.submitBtn.clicked.connect(self.submitBtnClick)
-        #print(self.setup.setupOutput.text())
-        
-        self.setupLayout.addWidget(self.submitBtn)
-
-        self.mainLayout.addLayout(self.setupLayout)
-
-        
-    def submitBtnClick(self):
-        print("Submitted setup info succesfully")
-        json_output = self.setup.model_output #setupOutput.text()
-        print("Sent json output data: "+str(json_output))
-        self.edit_messages(json_output)
-        self.goto("setup")
-    
-    @QtCore.pyqtSlot(str)
-    def update_messages(self, message_a):
-        self.message_a = message_a
-        self.message_a_display.setText(self.message_a)
-
-
-    def edit_messages(self, message):
-        self.dialog = SetupWindow()
-        self.dialog.set_messages(message)
-        '''self.dialog.submitted.connect(self.update_messages)
-        self.dialog.show()'''
-        
-    def getModelVariables(self):
-        return self.setup.model_output["name_variables"]
-    
-    
-
-
-class SetupWindow(PageWindow):
-    submitted = QtCore.pyqtSignal(str)
-
-    def __init__(self):
-        super().__init__()
-        self.initUI()
-        
-
-    def initUI(self):
-        self.setWindowTitle("Variable selection")
-        #self.UiComponents()
-
-    def goToMain(self):
-        self.goto("main")
-
-    def UiComponents(self):
-        #self.view.setModelVariables(json_data) #passed correctly
-        self.view = setup_view.SetupView()
-        
-        #print(self.view.variableNames)
-        self.view.show()
-
-        '''self.backButton = QtWidgets.QPushButton("BackButton", self)
-        self.backButton.setGeometry(QtCore.QRect(5, 5, 100, 20))
-        self.backButton.clicked.connect(self.goToMain)'''
-    
-    #triggered when the model submit button is pushed, sends data from that page over 
-    def set_messages(self, message_a: dict):
-        print("Got a message: ")
-        print(message_a)
-        #self.UiComponents(message_a)
-        #self.message_a_edit.setText(message_a)
-    
-
-    '''def on_submit(self):
-        self.submitted.emit(
-            self.message_a_edit.text()
-            )
-        self.close()'''
-
+import setup_view
+import model_view
 
 class Window(QtWidgets.QMainWindow):
     def __init__(self, parent=None):
@@ -172,19 +38,25 @@ class Window(QtWidgets.QMainWindow):
         self.stacked_widget = QtWidgets.QStackedWidget()
         self.setCentralWidget(self.stacked_widget)
 
+        # Create and register pages
         self.m_pages = {}
+        self.model = model_view.ModelView()
+        self.setup = setup_view.SetupView()
 
-        self.register(ModelSelect(), "main")
-        self.register(SetupWindow(), "setup")
+        self.register(self.model, "main")
+        self.register(self.setup, "setup")
 
+        # Connect Model's Submit Button to nextPage and setting Variables for setup page
+        self.model.connectSubmitButton(lambda: self.goto("setup"))
+        self.model.connectSubmitButton(lambda: self.setup.setVariables(self.model.getVariables()))
+
+        # Model page is first page
         self.goto("main")
         
 
     def register(self, widget, name):
         self.m_pages[name] = widget
         self.stacked_widget.addWidget(widget)
-        if isinstance(widget, PageWindow):
-            widget.gotoSignal.connect(self.goto)
     
 
     @QtCore.pyqtSlot(str)
@@ -194,104 +66,16 @@ class Window(QtWidgets.QMainWindow):
             self.stacked_widget.setCurrentWidget(widget)
             self.setWindowTitle(widget.windowTitle())
 
-
-class SetupFileInput(QWidget):
-        setup_file_name = ""   #SetupFile name
-
-        
-        """Custom widget for json setup data"""
-        def __init__(self):
-            super().__init__()
-            
-            self.model_output = {}
-
-            self.setupLayout = QGridLayout()
-            self.setLayout(self.setupLayout)
-
-            self.variableLabel = QLabel("JSON setup file Path: ")
-            self.setupInput = QLineEdit()
-            self.setupInput.setReadOnly(True)
-            self.outputLabel = QLabel("Setup output: ")
-            self.setupOutput = QLineEdit()
-
-            self.setupInputBtn = QPushButton("Get File")
-
-            #when button pushed get file using function
-            self.setupInputBtn.clicked.connect(self.getFile)
-
-            self.setupLayout.addWidget(self.variableLabel, 0, 0)
-            self.setupLayout.addWidget(self.setupInput, 0, 1)
-            self.setupLayout.addWidget(self.setupInputBtn, 0, 2)
-            self.setupLayout.addWidget(self.outputLabel, 1, 0)
-            self.setupLayout.addWidget(self.setupOutput, 1, 1)
-
-        '''Get Dialog Box to get filepath and update class'''
-        def getFile(self):
-            
-            file_filter = 'Data File (*.json)'
-            filepath,_ = QFileDialog.getOpenFileName(
-                parent=self,
-                caption='Select a data file',
-                directory=os.getcwd(),
-                filter=file_filter,
-                initialFilter='Data File (*.json)'
-            )
-
-
-            if filepath:
-                try:
-                    with open(filepath, 'r') as f:
-                        data = json.load(f)
-                    #print(str(list(data))) #all the json elements present
-
-                    self.setupInput.setText(filepath)
-                    
-                    filepath=self.setupInput.text()
-            
-                    self.model_output = {
-                        "number_variables":self._getNumberOfVariables(filepath),
-                        "name_variables":self._getVariableNames(filepath),
-                        "model_name":self._getModelName(filepath)
-                    }
-                    print("Model output: "+str(self.model_output))
-                    self.setupOutput.setText(json.dumps(self.model_output))
-                except FileNotFoundError as e:
-                    print("File '%s' could not be found" % e.filename)
-            return str(filepath)
-
-        '''Variables to send over '''
-        def _getNumberOfVariables(self, setup_name): 
-            with open(setup_name, 'r') as f:
-                data = json.load(f)
-
-            s = data["Direct"]
-            
-            return len(s[0])
-
-        def _getVariableNames(self, setup_name):
-            with open(setup_name, 'r') as f:
-                data = json.load(f)
-
-            s = data["Direct"]
-            
-            return s[0]
-        
-        def _getModelName(self, setup_name):
-            with open(setup_name, 'r') as f:
-                data = json.load(f)
-            return data["ModelName"]
-
-        '''Submit button'''
-        def submitNextPage(self):
-            print("Submitted setup info succesfully")
-            return 0
+def main():
+    """Main function"""
+    # Create an instance of QApplication and show
+    setup = QApplication(sys.argv)
+    main_page = Window()
+    main_page.show()
+    sys.exit(setup.exec_())
 
 if __name__ == "__main__":
-
-    app = QtWidgets.QApplication(sys.argv)
-    w = Window()
-    w.show()
-    sys.exit(app.exec_())
+    main()
             
 
 

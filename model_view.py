@@ -63,6 +63,12 @@ class ModelView(QMainWindow):
 
         self.mainLayout.addLayout(self.setupLayout)
 
+    def connectSubmitButton(self, hi):
+        self.setup.submitBtn.clicked.connect(hi)
+
+    def getVariables(self):
+        return self.setup.variables_names
+
 class SetupFileInput(QWidget):
         setup_file_name = ""   #SetupFile name
 
@@ -124,6 +130,9 @@ class SetupFileInput(QWidget):
                         "name_variables":self._getVariableNames(filepath),
                         "model_name":self._getModelName(filepath)
                     }
+
+                    self.variables_names = self._getVariableNames(filepath)
+
                     print(model_output)
                     self.setupOutput.setText(json.dumps(model_output))
                 except FileNotFoundError as e:
