@@ -22,7 +22,7 @@ class ModelView(QMainWindow):
         super().__init__()
         # Set some main window's properties
         self.setWindowTitle('Analysis Model')
-        self.setFixedSize(1000, 400)
+        self.setFixedSize(600, 400)
         # Set the central widget and the main layout
         self.mainLayout = QVBoxLayout()
         self._centralWidget = QWidget(self)

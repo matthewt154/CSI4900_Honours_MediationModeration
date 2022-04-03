@@ -55,7 +55,9 @@ class SetupView(QMainWindow):
         self.variables = {}
         for var in vnameList:
             self.variables[var] = VariableInput(var)
-            self.variablesLayout.addWidget(self.variables[var])
+            #self.variablesLayout.addWidget(self.variables[var])
+            self.scrollLayout.addWidget(self.variables[var])
+            self.scroll.setWidget(self.scrollContent)
 
     def NEW_setVariables(self):
         """Set Variables UI"""
@@ -66,6 +68,15 @@ class SetupView(QMainWindow):
         font.setBold(True)
         self.variablesLabel.setFont(font)
         self.variablesLayout.addWidget(self.variablesLabel)
+
+        # Add the Scrollable Area
+        self.scroll = QScrollArea()
+        self.variablesLayout.addWidget(self.scroll)
+        self.scroll.setWidgetResizable(True)
+        self.scrollContent = QWidget(self.scroll)
+        # Add set Layout to Scrollable Area
+        self.scrollLayout = QVBoxLayout(self.scrollContent)
+        self.scrollContent.setLayout(self.scrollLayout)
 
         # Create variables dict
         self.variables = {}
