@@ -63,17 +63,11 @@ class ModelView(QMainWindow):
 
         self.mainLayout.addLayout(self.setupLayout)
 
-    '''def _setSubmitButton(self):
-        """Set Submit Button"""
-        self.submitBtn = QPushButton("Submit")
-        self.mainLayout.addWidget(self.submitBtn)
-        #when button pushed pass variables to next page
-        self.submitBtn.clicked.connect(self.submitNextPage)
-    
-    def submitNextPage(self):
-        return 0'''
+    def connectSubmitButton(self, hi):
+        self.setup.submitBtn.clicked.connect(hi)
 
-    
+    def getVariables(self):
+        return self.setup.variables_names
 
 class SetupFileInput(QWidget):
         setup_file_name = ""   #SetupFile name
@@ -108,8 +102,6 @@ class SetupFileInput(QWidget):
             self.setupLayout.addWidget(self.setupOutput, 1, 1)
             self.setupLayout.addWidget(self.submitBtn, 2, 1)
 
-            
-        
         '''Get Dialog Box to get filepath and update class'''
         def getFile(self):
             
@@ -138,6 +130,9 @@ class SetupFileInput(QWidget):
                         "name_variables":self._getVariableNames(filepath),
                         "model_name":self._getModelName(filepath)
                     }
+
+                    self.variables_names = self._getVariableNames(filepath)
+
                     print(model_output)
                     self.setupOutput.setText(json.dumps(model_output))
                 except FileNotFoundError as e:

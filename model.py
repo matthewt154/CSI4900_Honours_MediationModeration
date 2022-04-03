@@ -28,7 +28,7 @@ def main():
     #model = model_input.ModelInput()
     
     # Get controller
-    model_controller.ModelController(view=view)
+    #model_controller.ModelController(view=view)
     # Execute the model gui main loop
     sys.exit(model.exec_())
 
