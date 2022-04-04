@@ -9,7 +9,7 @@ from PyQt5.QtWidgets import QMainWindow
 from PyQt5.QtWidgets import QWidget
 from PyQt5.QtWidgets import QComboBox
 from PyQt5.QtWidgets import QLabel
-from PyQt5.QtWidgets import QFileDialog
+from PyQt5.QtWidgets import QFileDialog, QErrorMessage, QMessageBox
 from PyQt5.QtWidgets import QScrollArea
 from PyQt5.QtGui import QIntValidator, QFont
 
@@ -128,6 +128,15 @@ class SetupView(QMainWindow):
 
     def createAnalysisFile(self):
         """Create Analysis File using the user inputs"""
+
+        # Checks if any variables are incomplete
+        for var in self.variables:
+            if self.variables[var].isIncomplete():
+                msg = QMessageBox()
+                msg.setIcon(QMessageBox.Warning)
+                msg.setText("Variable " + var + " is incomplete.")
+                msg.exec_()
+                return
 
         # Save Dialog for where to save json
         analysisFilePath,_ = QFileDialog.getSaveFileName(

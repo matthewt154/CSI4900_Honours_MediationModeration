@@ -70,3 +70,7 @@ class BrainImageMaskInput(QWidget):
     def getMaskFilepath(self):
         '''Return mask filepath string'''
         return str(self.maskInput.text())
+    
+    def isIncomplete(self):
+        '''Returns True if the input is incomplete'''
+        return not bool(self.brainImageInput.text()) or not bool(self.maskInput.text())

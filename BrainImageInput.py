@@ -58,3 +58,7 @@ class BrainImageInput(QWidget):
     def getFilepath(self):
         '''Return data filepath string'''
         return str(self.brainImageInput.text())
+    
+    def isIncomplete(self):
+        '''Returns True if the input is incomplete'''     
+        return not bool(self.brainImageInput.text())

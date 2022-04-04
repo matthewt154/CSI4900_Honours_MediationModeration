@@ -73,3 +73,7 @@ class CsvInput(QWidget):
     def getColumn(self):
         '''Return selected data column string'''
         return str(self.csvInputColumn.currentText())
+
+    def isIncomplete(self):        
+        '''Returns True if the input is incomplete'''
+        return not bool(self.csvInput.text()) or not bool(self.csvInputColumn.currentText())

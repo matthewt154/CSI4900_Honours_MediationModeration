@@ -63,6 +63,9 @@ class ModelView(QMainWindow):
 
         self.mainLayout.addLayout(self.setupLayout)
 
+        self.setup.variables_names = []
+        self.setup.modelJson = {}
+
     def connectSubmitButton(self, hi):
         self.setup.submitBtn.clicked.connect(hi)
 
