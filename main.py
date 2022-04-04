@@ -49,6 +49,7 @@ class Window(QtWidgets.QMainWindow):
         # Connect Model's Submit Button to nextPage and setting Variables for setup page
         self.model.connectSubmitButton(lambda: self.goto("setup"))
         self.model.connectSubmitButton(lambda: self.setup.setVariables(self.model.getVariables()))
+        self.model.connectSubmitButton(lambda: self.setup.setModelJson(self.model.getModelJson()))
 
         # Model page is first page
         self.goto("main")

@@ -68,6 +68,9 @@ class ModelView(QMainWindow):
 
     def getVariables(self):
         return self.setup.variables_names
+    
+    def getModelJson(self):
+        return self.setup.modelJson
 
 class SetupFileInput(QWidget):
         setup_file_name = ""   #SetupFile name
@@ -132,6 +135,7 @@ class SetupFileInput(QWidget):
                     }
 
                     self.variables_names = self._getVariableNames(filepath)
+                    self.modelJson = data
 
                     print(model_output)
                     self.setupOutput.setText(json.dumps(model_output))

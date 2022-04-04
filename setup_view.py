@@ -27,9 +27,9 @@ class SetupView(QMainWindow):
     def __init__(self):
         """View initializer"""
         super().__init__()
+
         # Set some main window's properties
         self.setWindowTitle('Analysis Setup')
-
         self.setFixedSize(600, 900)
 
         # Set the central widget and the main layout
@@ -38,28 +38,15 @@ class SetupView(QMainWindow):
         self.setCentralWidget(self._centralWidget)
         self._centralWidget.setLayout(self.mainLayout)
 
-        #self.mainlink = main.ModelSelect()
-        #TODO: Link up to Model's variables + functionality
-        #self.variableNames = self.mainlink.getModelVariables() #["A", "B", "C", "D"]
-        #self.variableNames = ["A", "B", "C", "D"]
-        
-        #print("Variable names: "+str(self.variableNames))
-        #self._setVariables(self.variableNames)
-        self.NEW_setVariables()
+        #Set View 
+        self._setVariablesView()
+        self._setParametersView()
+        self._setAnalysisButtonView()
 
-        self._setParameters()
+        #Initialise modelJson
+        self.modelJson = {}
 
-        self._setAnalysisButton()
-
-    def setVariables(self, vnameList):
-        self.variables = {}
-        for var in vnameList:
-            self.variables[var] = VariableInput(var)
-            #self.variablesLayout.addWidget(self.variables[var])
-            self.scrollLayout.addWidget(self.variables[var])
-            self.scroll.setWidget(self.scrollContent)
-
-    def NEW_setVariables(self):
+    def _setVariablesView(self):
         """Set Variables UI"""
         # Create variables layout
         self.variablesLayout = QVBoxLayout()
@@ -83,35 +70,7 @@ class SetupView(QMainWindow):
 
         self.mainLayout.addLayout(self.variablesLayout)
 
-    def _setVariables(self, variableNameList):
-        """Set Variables UI"""
-        # Create variables layout
-        self.variablesLayout = QVBoxLayout()
-        self.variablesLabel = QLabel("Variables")
-        font = QFont()
-        font.setBold(True)
-        self.variablesLabel.setFont(font)
-        self.variablesLayout.addWidget(self.variablesLabel)
-
-        # Add the Scrollable Area
-        self.scroll = QScrollArea()
-        self.variablesLayout.addWidget(self.scroll)
-        self.scroll.setWidgetResizable(True)
-        self.scrollContent = QWidget(self.scroll)
-        # Add set Layout to Scrollable Area
-        scrollLayout = QVBoxLayout(self.scrollContent)
-        self.scrollContent.setLayout(scrollLayout)
-
-        # Create variable inputs for each variable
-        self.variables = {}
-        for var in variableNameList:
-            self.variables[var] = VariableInput(var)
-            scrollLayout.addWidget(self.variables[var])
-            self.scroll.setWidget(self.scrollContent)
-
-        self.mainLayout.addLayout(self.variablesLayout)
-
-    def _setParameters(self):
+    def _setParametersView(self):
         """Set Paramaters UI"""
         # Create parameters layout
         self.paramatersLayout = QVBoxLayout()
@@ -160,32 +119,57 @@ class SetupView(QMainWindow):
         # Add parameters to main Layout
         self.mainLayout.addLayout(self.paramatersLayout)
 
-    def _setAnalysisButton(self):
-        """Set Analysis Button"""
+    def _setAnalysisButtonView(self):
+        """Set Analysis Button UI"""
         self.analysisBtn = QPushButton("Create Analysis File")
         self.mainLayout.addWidget(self.analysisBtn)
 
         self.analysisBtn.clicked.connect(self.createAnalysisFile)
 
     def createAnalysisFile(self):
-        analysis_dict = {}
+        """Create Analysis File using the user inputs"""
 
-        var_array = []
-        for var in self.variables:
-            print(self.variables[var].getCurrentVariable())
-            var_array.append(self.variables[var].getCurrentVariable())
+        # Save Dialog for where to save json
+        analysisFilePath,_ = QFileDialog.getSaveFileName(
+            parent=self,
+            caption='Save Analysis File as',
+            directory=os.getcwd(),
+            filter="Json File (*.json)"
+        )
 
-        analysis_dict["Variables"] = var_array
-        analysis_dict["Bootstrap"] = str(self.bootstraps.text())
-        analysis_dict["Confidence_Interval"] = str(self.confidenceInterval.currentText())
-        analysis_dict["TFCE"] = str(self.tcfe.currentText())
-        analysis_dict["Correction_Type"] = str(self.comparisons.currentText())
+        if analysisFilePath:
+            # Set setup model selected
+            analysis_dict = self.modelJson
 
-        analysisString = json.dumps(analysis_dict)
-        jsonFile = open("analysis_output.json", "w")
-        jsonFile.write(analysisString)
-        jsonFile.close()
+            # Set Variables 
+            var_array = []
+            for var in self.variables:
+                print(self.variables[var].getCurrentVariable())
+                var_array.append(self.variables[var].getCurrentVariable())
+            analysis_dict["Variables"] = var_array
 
+            # Set Paramaters
+            analysis_dict["Bootstrap"] = str(self.bootstraps.text())
+            analysis_dict["Confidence_Interval"] = str(self.confidenceInterval.currentText())
+            analysis_dict["TFCE"] = str(self.tcfe.currentText())
+            analysis_dict["Correction_Type"] = str(self.comparisons.currentText())
+
+            # Create Json and write to output file
+            analysisString = json.dumps(analysis_dict)
+            jsonFile = open(analysisFilePath, "w")
+            jsonFile.write(analysisString)
+            jsonFile.close()
+
+    def setVariables(self, vnameList: list):
+        self.variables = {}
+        for var in vnameList:
+            self.variables[var] = VariableInput(var)
+            self.scrollLayout.addWidget(self.variables[var])
+            self.scroll.setWidget(self.scrollContent)
+    
+    def setModelJson(self, modelJson: dict):
+        self.modelJson = modelJson
+        print(self.modelJson)
     
     def setModelVariables(self, data: dict):
         self.variableNames = data["name_variables"]
