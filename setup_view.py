@@ -9,46 +9,44 @@ from PyQt5.QtWidgets import QMainWindow
 from PyQt5.QtWidgets import QWidget
 from PyQt5.QtWidgets import QComboBox
 from PyQt5.QtWidgets import QLabel
-from PyQt5.QtWidgets import QFileDialog
+from PyQt5.QtWidgets import QFileDialog, QErrorMessage, QMessageBox
+from PyQt5.QtWidgets import QScrollArea
 from PyQt5.QtGui import QIntValidator, QFont
 
 import os
+
+import json
+
+from VariableInput import VariableInput
+
 #import main
+
 
 class SetupView(QMainWindow):
     """Analysis Setup View class (GUI)"""
     def __init__(self):
         """View initializer"""
         super().__init__()
+
         # Set some main window's properties
         self.setWindowTitle('Analysis Setup')
-        self.setFixedSize(1000, 1000)
+        self.setFixedSize(600, 900)
+
         # Set the central widget and the main layout
         self.mainLayout = QVBoxLayout()
         self._centralWidget = QWidget(self)
         self.setCentralWidget(self._centralWidget)
         self._centralWidget.setLayout(self.mainLayout)
 
-        #self.mainlink = main.ModelSelect()
-        #TODO: Link up to Model's variables + functionality
-        #self.variableNames = self.mainlink.getModelVariables() #["A", "B", "C", "D"]
-        #self.variableNames = ["A", "B", "C", "D"]
-        
-        #print("Variable names: "+str(self.variableNames))
-        #self._setVariables(self.variableNames)
-        self.NEW_setVariables()
+        #Set View 
+        self._setVariablesView()
+        self._setParametersView()
+        self._setAnalysisButtonView()
 
-        self._setParameters()
+        #Initialise modelJson
+        self.modelJson = {}
 
-        self._setAnalysisButton()
-
-    def setVariables(self, vnameList):
-        self.variables = {}
-        for var in vnameList:
-            self.variables[var] = VariableInput(var)
-            self.variablesLayout.addWidget(self.variables[var])
-
-    def NEW_setVariables(self):
+    def _setVariablesView(self):
         """Set Variables UI"""
         # Create variables layout
         self.variablesLayout = QVBoxLayout()
@@ -57,31 +55,22 @@ class SetupView(QMainWindow):
         font.setBold(True)
         self.variablesLabel.setFont(font)
         self.variablesLayout.addWidget(self.variablesLabel)
+
+        # Add the Scrollable Area
+        self.scroll = QScrollArea()
+        self.variablesLayout.addWidget(self.scroll)
+        self.scroll.setWidgetResizable(True)
+        self.scrollContent = QWidget(self.scroll)
+        # Add set Layout to Scrollable Area
+        self.scrollLayout = QVBoxLayout(self.scrollContent)
+        self.scrollContent.setLayout(self.scrollLayout)
 
         # Create variables dict
         self.variables = {}
 
         self.mainLayout.addLayout(self.variablesLayout)
 
-    def _setVariables(self, variableNameList):
-        """Set Variables UI"""
-        # Create variables layout
-        self.variablesLayout = QVBoxLayout()
-        self.variablesLabel = QLabel("Variables")
-        font = QFont()
-        font.setBold(True)
-        self.variablesLabel.setFont(font)
-        self.variablesLayout.addWidget(self.variablesLabel)
-
-        # Create variable inputs for each variable
-        self.variables = {}
-        for var in variableNameList:
-            self.variables[var] = VariableInput(var)
-            self.variablesLayout.addWidget(self.variables[var])
-
-        self.mainLayout.addLayout(self.variablesLayout)
-
-    def _setParameters(self):
+    def _setParametersView(self):
         """Set Paramaters UI"""
         # Create parameters layout
         self.paramatersLayout = QVBoxLayout()
@@ -130,116 +119,66 @@ class SetupView(QMainWindow):
         # Add parameters to main Layout
         self.mainLayout.addLayout(self.paramatersLayout)
 
-    def _setAnalysisButton(self):
-        """Set Analysis Button"""
+    def _setAnalysisButtonView(self):
+        """Set Analysis Button UI"""
         self.analysisBtn = QPushButton("Create Analysis File")
         self.mainLayout.addWidget(self.analysisBtn)
+
+        self.analysisBtn.clicked.connect(self.createAnalysisFile)
+
+    def createAnalysisFile(self):
+        """Create Analysis File using the user inputs"""
+
+        # Checks if any variables are incomplete
+        for var in self.variables:
+            if self.variables[var].isIncomplete():
+                msg = QMessageBox()
+                msg.setIcon(QMessageBox.Warning)
+                msg.setText("Variable " + var + " is incomplete.")
+                msg.exec_()
+                return
+
+        # Save Dialog for where to save json
+        analysisFilePath,_ = QFileDialog.getSaveFileName(
+            parent=self,
+            caption='Save Analysis File as',
+            directory=os.getcwd(),
+            filter="Json File (*.json)"
+        )
+
+        if analysisFilePath:
+            # Set setup model selected
+            analysis_dict = self.modelJson
+
+            # Set Variables 
+            var_array = []
+            for var in self.variables:
+                print(self.variables[var].getCurrentVariable())
+                var_array.append(self.variables[var].getCurrentVariable())
+            analysis_dict["Variables"] = var_array
+
+            # Set Paramaters
+            analysis_dict["Bootstrap"] = str(self.bootstraps.text())
+            analysis_dict["Confidence_Interval"] = str(self.confidenceInterval.currentText())
+            analysis_dict["TFCE"] = str(self.tcfe.currentText())
+            analysis_dict["Correction_Type"] = str(self.comparisons.currentText())
+
+            # Create Json and write to output file
+            analysisString = json.dumps(analysis_dict)
+            jsonFile = open(analysisFilePath, "w")
+            jsonFile.write(analysisString)
+            jsonFile.close()
+
+    def setVariables(self, vnameList: list):
+        self.variables = {}
+        for var in vnameList:
+            self.variables[var] = VariableInput(var)
+            self.scrollLayout.addWidget(self.variables[var])
+            self.scroll.setWidget(self.scrollContent)
+    
+    def setModelJson(self, modelJson: dict):
+        self.modelJson = modelJson
+        print(self.modelJson)
     
     def setModelVariables(self, data: dict):
         self.variableNames = data["name_variables"]
-
-
-class CsvInput(QWidget):
-    """Custom widget for csv data"""
-    def __init__(self):
-        super().__init__()
-        
-        self.csvLayout = QGridLayout()
-        self.setLayout(self.csvLayout)
-
-        self.variableLabel = QLabel("Csv File Path: ")
-        self.csvInput = QLineEdit()
-        self.csvInput.setReadOnly(True)
-        self.csvInputBtn = QPushButton("Get File")
-        self.columnLabel = QLabel("Column: ")
-        self.csvInputColumn = QComboBox()
-
-
-        #self.csvInputBtn.clicked.connect(self.getFile)
-
-        self.csvLayout.addWidget(self.variableLabel, 0, 0)
-        self.csvLayout.addWidget(self.csvInput, 0, 1)
-        self.csvLayout.addWidget(self.csvInputBtn, 0, 2)
-        self.csvLayout.addWidget(self.columnLabel, 1, 0)
-        self.csvLayout.addWidget(self.csvInputColumn, 1, 1)
-
-class BrainImageInput(QWidget):
-    """Custom widget for maskless brain image data"""
-    def __init__(self):
-        super().__init__()
-        
-        self.brainImageLayout = QGridLayout()
-        self.setLayout(self.brainImageLayout)
-
-        self.variableLabel = QLabel("Brain Image File Path: ")
-        self.brainImageInput = QLineEdit()
-        self.brainImageInput.setReadOnly(True)
-        self.brainImageInputBtn = QPushButton("Get File")
-
-
-        #self.csvInputBtn.clicked.connect(self.getFile)
-
-        self.brainImageLayout.addWidget(self.variableLabel, 0, 0)
-        self.brainImageLayout.addWidget(self.brainImageInput, 0, 1)
-        self.brainImageLayout.addWidget(self.brainImageInputBtn, 0, 2)
-
-class BrainImageMaskInput(QWidget):
-    """Custom widget for brain image data with mask"""
-    def __init__(self):
-        super().__init__()
-        
-        self.brainImageLayout = QGridLayout()
-        self.setLayout(self.brainImageLayout)
-
-        self.variableLabel = QLabel("Brain Image File Path: ")
-        self.brainImageInput = QLineEdit()
-        self.brainImageInput.setReadOnly(True)
-        self.brainImageInputBtn = QPushButton("Get File")
-        self.maskLabel = QLabel("Mask File Path: ")
-        self.maskInput = QLineEdit()
-        self.maskInput.setReadOnly(True)
-        self.maskInputBtn = QPushButton("Get File")
-
-
-        #self.csvInputBtn.clicked.connect(self.getFile)
-
-        self.brainImageLayout.addWidget(self.variableLabel, 0, 0)
-        self.brainImageLayout.addWidget(self.brainImageInput, 0, 1)
-        self.brainImageLayout.addWidget(self.brainImageInputBtn, 0, 2)
-        self.brainImageLayout.addWidget(self.maskLabel, 1, 0)
-        self.brainImageLayout.addWidget(self.maskInput, 1, 1)
-        self.brainImageLayout.addWidget(self.maskInputBtn, 1, 2)
-
-class VariableInput(QWidget):
-
-    variableName = ""   #Variable name
-
-    def __init__(self, vname):
-        super().__init__()
-
-        variableName = vname
-
-        self.variableInputLayout = QVBoxLayout()
-
-        self.variablesLabel = QLabel("Variable " + variableName)
-        self.variableInputLayout.addWidget(self.variablesLabel)
-
-
-        self.variableNums = QComboBox()
-        self.variableNums.addItems(["csv","brain image data (maskless)","brain image data (with mask)"])
-        self.variableInputLayout.addWidget(self.variableNums)
-        self.setLayout(self.variableInputLayout)
-
-        self.variablesLayout = QStackedLayout()
-
-        self.csv = CsvInput()
-        self.brainImageData = BrainImageInput()
-        self.brainImageMaskData = BrainImageMaskInput()
-
-        self.variablesLayout.addWidget(self.csv)
-        self.variablesLayout.addWidget(self.brainImageData)
-        self.variablesLayout.addWidget(self.brainImageMaskData)
-
-        self.variableInputLayout.addLayout(self.variablesLayout)
-
-        self.variableNums.currentIndexChanged.connect(self.variablesLayout.setCurrentIndex)

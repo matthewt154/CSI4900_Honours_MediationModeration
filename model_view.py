@@ -22,7 +22,7 @@ class ModelView(QMainWindow):
         super().__init__()
         # Set some main window's properties
         self.setWindowTitle('Analysis Model')
-        self.setFixedSize(1000, 400)
+        self.setFixedSize(600, 400)
         # Set the central widget and the main layout
         self.mainLayout = QVBoxLayout()
         self._centralWidget = QWidget(self)
@@ -63,11 +63,17 @@ class ModelView(QMainWindow):
 
         self.mainLayout.addLayout(self.setupLayout)
 
+        self.setup.variables_names = []
+        self.setup.modelJson = {}
+
     def connectSubmitButton(self, hi):
         self.setup.submitBtn.clicked.connect(hi)
 
     def getVariables(self):
         return self.setup.variables_names
+    
+    def getModelJson(self):
+        return self.setup.modelJson
 
 class SetupFileInput(QWidget):
         setup_file_name = ""   #SetupFile name
@@ -132,6 +138,7 @@ class SetupFileInput(QWidget):
                     }
 
                     self.variables_names = self._getVariableNames(filepath)
+                    self.modelJson = data
 
                     print(model_output)
                     self.setupOutput.setText(json.dumps(model_output))

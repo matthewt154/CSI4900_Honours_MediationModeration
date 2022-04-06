@@ -25,9 +25,9 @@ class SetupController:
         self._view.comparisons.currentTextChanged.connect(partial(self._model._updateParamaters, "Correction_Type"))
 
         # Connect Analysis button
-        self._view.analysisBtn.clicked.connect(self._model._createAnalysisFile)
+        #self._view.analysisBtn.clicked.connect(self._model._createAnalysisFile)
 
-    def getFile(self):
+    '''def getFile(self):
         file_filter = 'Data File (*.csv)'
         response = QFileDialog.getOpenFileName(
             parent=self,
@@ -36,4 +36,4 @@ class SetupController:
             filter=file_filter,
             initialFilter='Data File (*.csv)'
         )
-        print(response)
+        print(response)'''
