@@ -1,17 +1,12 @@
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QGridLayout, QStackedLayout
+from PyQt5.QtWidgets import QGridLayout
 from PyQt5.QtWidgets import QLineEdit
 from PyQt5.QtWidgets import QPushButton
-from PyQt5.QtWidgets import QVBoxLayout, QHBoxLayout
-from PyQt5.QtWidgets import QApplication
-from PyQt5.QtWidgets import QMainWindow
 from PyQt5.QtWidgets import QWidget
 from PyQt5.QtWidgets import QComboBox
 from PyQt5.QtWidgets import QLabel
 from PyQt5.QtWidgets import QFileDialog
-from PyQt5.QtGui import QIntValidator, QFont
 
-import numpy as np
 import pandas as pd
 import os
 from functools import partial
@@ -20,6 +15,7 @@ from functools import partial
 class CsvInput(QWidget):
     """Custom widget for csv data"""
     def __init__(self):
+        """Initialize CsvInput View"""
         super().__init__()
 
         self.setFixedHeight(100)
@@ -44,7 +40,7 @@ class CsvInput(QWidget):
         self.csvInputBtn.clicked.connect(self.getFile)
 
     def getFile(self):
-        '''Get Dialog Box to get filepath and update class'''
+        """Get Dialog Box to get filepath and update class"""
         file_filter = 'Data File (*.csv)'
         filepath,_ = QFileDialog.getOpenFileName(
             parent=self,
@@ -67,13 +63,13 @@ class CsvInput(QWidget):
                 print("File '%s' could not be found" % e.filename)
     
     def getFilepath(self):
-        '''Return data filepath string'''
+        """Return data filepath string"""
         return str(self.csvInput.text())
     
     def getColumn(self):
-        '''Return selected data column string'''
+        """Return selected data column string"""
         return str(self.csvInputColumn.currentText())
 
     def isIncomplete(self):        
-        '''Returns True if the input is incomplete'''
+        """Returns True if the input is incomplete"""
         return not bool(self.csvInput.text()) or not bool(self.csvInputColumn.currentText())

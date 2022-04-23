@@ -33,9 +33,10 @@ def create_brain_data(img_data, mask):
         brain_data.append(pfn)
     return np.array(brain_data)
 
+# Filepath to use
+filepath = "example_output.json"
 
-filepath = "Data/test_model.json"
-
+# Get data from Json
 with open(filepath, 'r') as f:
     data = json.load(f)
 
@@ -44,15 +45,19 @@ Direct = data["Direct"]
 Interaction = data["Interaction"]
 Path = data["Path"]
 Variables = data["Variables"]
-#Out = data["Out"]
-#In = data["In"]
-#Inter = data["Inter"]
+Out = data["Out"]
+In = data["In"]
+Inter = data["Inter"]
 
-#print(ModelName)
-#print(Direct)
-#print(Interaction)
-#print(Path)
-#print(Variables)
+# Print data
+print(ModelName)
+print(Direct)
+print(Interaction)
+print(Path)
+print(Variables)
+print(Out)
+print(In)
+print(Inter)
 
 # Read variable data
 for i,_ in enumerate(Variables):
@@ -64,6 +69,7 @@ for i,_ in enumerate(Variables):
         column = Variables[i]["column"]
 
         X = pd.read_csv(data_filepath)
+
         print(list(X[column]))
 
     elif var_type == "brain image data (maskless)":

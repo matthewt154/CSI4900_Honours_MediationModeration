@@ -1,31 +1,24 @@
-import string
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QGridLayout, QStackedLayout
 from PyQt5.QtWidgets import QLineEdit
 from PyQt5.QtWidgets import QPushButton
 from PyQt5.QtWidgets import QVBoxLayout, QHBoxLayout
-from PyQt5.QtWidgets import QApplication
 from PyQt5.QtWidgets import QMainWindow
 from PyQt5.QtWidgets import QWidget
 from PyQt5.QtWidgets import QComboBox
 from PyQt5.QtWidgets import QLabel
-from PyQt5.QtWidgets import QFileDialog, QErrorMessage, QMessageBox
+from PyQt5.QtWidgets import QFileDialog, QMessageBox
 from PyQt5.QtWidgets import QScrollArea
 from PyQt5.QtGui import QIntValidator, QFont
 
 import os
-
 import json
 
 from VariableInput import VariableInput
 
-#import main
-
-
 class SetupView(QMainWindow):
     """Analysis Setup View class (GUI)"""
     def __init__(self):
-        """View initializer"""
+        """Initialize View"""
         super().__init__()
 
         # Set some main window's properties
@@ -164,12 +157,13 @@ class SetupView(QMainWindow):
             analysis_dict["Correction_Type"] = str(self.comparisons.currentText())
 
             # Create Json and write to output file
-            analysisString = json.dumps(analysis_dict)
+            analysisString = json.dumps(analysis_dict, indent=4)
             jsonFile = open(analysisFilePath, "w")
             jsonFile.write(analysisString)
             jsonFile.close()
 
     def setVariables(self, vnameList: list):
+        """Set Variables to create the Variable Inputs"""
         self.variables = {}
         for var in vnameList:
             self.variables[var] = VariableInput(var)
@@ -177,8 +171,6 @@ class SetupView(QMainWindow):
             self.scroll.setWidget(self.scrollContent)
     
     def setModelJson(self, modelJson: dict):
+        """Set ModelJson with given dict"""
         self.modelJson = modelJson
         print(self.modelJson)
-    
-    def setModelVariables(self, data: dict):
-        self.variableNames = data["name_variables"]

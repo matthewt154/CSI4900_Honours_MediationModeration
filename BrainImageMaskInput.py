@@ -1,24 +1,18 @@
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QGridLayout, QStackedLayout
+from PyQt5.QtWidgets import QGridLayout
 from PyQt5.QtWidgets import QLineEdit
 from PyQt5.QtWidgets import QPushButton
-from PyQt5.QtWidgets import QVBoxLayout, QHBoxLayout
-from PyQt5.QtWidgets import QApplication
-from PyQt5.QtWidgets import QMainWindow
 from PyQt5.QtWidgets import QWidget
-from PyQt5.QtWidgets import QComboBox
 from PyQt5.QtWidgets import QLabel
 from PyQt5.QtWidgets import QFileDialog
-from PyQt5.QtGui import QIntValidator, QFont
 
-import numpy as np
-import pandas as pd
 import os
 from functools import partial
 
 class BrainImageMaskInput(QWidget):
     """Custom widget for brain image data with mask"""
     def __init__(self):
+        """Initialize BrainImageMaskInput View"""
         super().__init__()
 
         self.setFixedHeight(100)
@@ -46,7 +40,7 @@ class BrainImageMaskInput(QWidget):
         self.maskInputBtn.clicked.connect(partial(self.getFile, self.maskInput))
 
     def getFile(self, input: QLineEdit):
-        '''Get Dialog Box to get filepath and update QLineEdit input'''
+        """Get Dialog Box to get filepath and update QLineEdit input"""
         file_filter = 'Nii File (*.nii.gz)'
         filepath,_ = QFileDialog.getOpenFileName(
             parent=self,
@@ -64,13 +58,13 @@ class BrainImageMaskInput(QWidget):
                 print("File '%s' could not be found" % e.filename)
     
     def getFilepath(self):
-        '''Return data filepath string'''
+        """Return data filepath string"""
         return str(self.brainImageInput.text())
     
     def getMaskFilepath(self):
-        '''Return mask filepath string'''
+        """Return mask filepath string"""
         return str(self.maskInput.text())
     
     def isIncomplete(self):
-        '''Returns True if the input is incomplete'''
+        """Returns True if the input is incomplete"""
         return not bool(self.brainImageInput.text()) or not bool(self.maskInput.text())

@@ -1,28 +1,18 @@
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QGridLayout, QStackedLayout
-from PyQt5.QtWidgets import QLineEdit
-from PyQt5.QtWidgets import QPushButton
-from PyQt5.QtWidgets import QVBoxLayout, QHBoxLayout
-from PyQt5.QtWidgets import QApplication
-from PyQt5.QtWidgets import QMainWindow
+from PyQt5.QtWidgets import QStackedLayout
+from PyQt5.QtWidgets import QVBoxLayout
 from PyQt5.QtWidgets import QWidget
 from PyQt5.QtWidgets import QComboBox
 from PyQt5.QtWidgets import QLabel
-from PyQt5.QtWidgets import QFileDialog
-from PyQt5.QtGui import QIntValidator, QFont
-
-import numpy as np
-import pandas as pd
-import os
-from functools import partial
 
 from CsvInput import CsvInput
 from BrainImageInput import BrainImageInput
 from BrainImageMaskInput import BrainImageMaskInput
 
 class VariableInput(QWidget):
-
+    """Custom widget for variable data input"""
     def __init__(self, vname):
+        """Initialize Variable Input View"""
         super().__init__()
 
         self.variableName = vname #Variable name
@@ -53,7 +43,7 @@ class VariableInput(QWidget):
         self.variableNums.currentIndexChanged.connect(self.variablesLayout.setCurrentIndex)
     
     def getCurrentVariable(self):
-
+        """Get the current variable in json format"""
         currentVar = self.variableNums.currentText()
 
         if currentVar == "csv":
@@ -72,7 +62,7 @@ class VariableInput(QWidget):
                 "mask_filepath": self.brainImageMaskData.getMaskFilepath()}
     
     def isIncomplete(self):
-        '''Returns True if the current input is incomplete'''
+        """Returns True if the current input is incomplete"""
         currentVar = self.variableNums.currentText()
 
         if currentVar == "csv":

@@ -1,16 +1,13 @@
-import string
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QGridLayout, QStackedLayout
+from PyQt5.QtWidgets import QGridLayout
 from PyQt5.QtWidgets import QLineEdit
 from PyQt5.QtWidgets import QPushButton
-from PyQt5.QtWidgets import QVBoxLayout, QHBoxLayout
-from PyQt5.QtWidgets import QApplication
+from PyQt5.QtWidgets import QVBoxLayout
 from PyQt5.QtWidgets import QMainWindow
 from PyQt5.QtWidgets import QWidget
-from PyQt5.QtWidgets import QComboBox
 from PyQt5.QtWidgets import QLabel
 from PyQt5.QtWidgets import QFileDialog
-from PyQt5.QtGui import QIntValidator, QFont
+from PyQt5.QtGui import QFont
 
 import os
 import json
@@ -18,7 +15,7 @@ import json
 class ModelView(QMainWindow):
     """Analysis Model View class (GUI)"""
     def __init__(self):
-        """View initializer"""
+        """Initialize View"""
         super().__init__()
         # Set some main window's properties
         self.setWindowTitle('Analysis Model')
@@ -29,18 +26,11 @@ class ModelView(QMainWindow):
         self.setCentralWidget(self._centralWidget)
         self._centralWidget.setLayout(self.mainLayout)
 
-        #TODO: Grab variable names and number from setup file
-
-        self._setSetupInput() #just ask for setup file path
-
-        '''numberOfVariables = self._getNumberOfVariables()
-        variableNames = self._getVariableNames()'''
-
-        '''self._setSubmitButton()'''
+        self._setSetupInput()
 
     
     def _setSetupInput(self):
-        """Set Setup UI"""
+        """Set the Setup UI"""
         # Create setup layout
         self.setupLayout = QVBoxLayout()
         self.setupLabel = QLabel("Setup file")
@@ -66,18 +56,19 @@ class ModelView(QMainWindow):
         self.setup.variables_names = []
         self.setup.modelJson = {}
 
-    def connectSubmitButton(self, hi):
-        self.setup.submitBtn.clicked.connect(hi)
+    def connectSubmitButton(self, lambda_fnc):
+        """Connect the submit button with a lambda function"""
+        self.setup.submitBtn.clicked.connect(lambda_fnc)
 
     def getVariables(self):
+        """Get variable names"""
         return self.setup.variables_names
     
     def getModelJson(self):
+        """Get modelJson from the input"""
         return self.setup.modelJson
 
 class SetupFileInput(QWidget):
-        setup_file_name = ""   #SetupFile name
-
         """Custom widget for json setup data"""
         def __init__(self):
             super().__init__()
@@ -90,6 +81,7 @@ class SetupFileInput(QWidget):
             self.setupInput.setReadOnly(True)
             self.outputLabel = QLabel("Setup output: ")
             self.setupOutput = QLineEdit()
+            self.setupOutput.setReadOnly(True)
 
             self.setupInputBtn = QPushButton("Get File")
 

@@ -2,37 +2,21 @@
 import sys
 
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QGridLayout, QStackedLayout
-from PyQt5.QtWidgets import QLineEdit
-from PyQt5.QtWidgets import QPushButton
-from PyQt5.QtWidgets import QVBoxLayout, QHBoxLayout
 from PyQt5.QtWidgets import QApplication
 from PyQt5.QtWidgets import QMainWindow
-from PyQt5.QtWidgets import QWidget
-from PyQt5.QtWidgets import QComboBox
-from PyQt5.QtWidgets import QLabel
-from PyQt5.QtWidgets import QFileDialog
-from PyQt5.QtGui import QIntValidator, QFont
-
-import os
-import json
 
 from PyQt5.QtWidgets import QApplication
-from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5 import QtCore, QtWidgets
 
-# import view (GUI), model and controller
-import model
-import setup
+# import window views
 import model_view
 import setup_view
-#import model_input
-import model_controller
-
-import setup_view
-import model_view
 
 class Window(QtWidgets.QMainWindow):
+    """Main Window"""
+
     def __init__(self, parent=None):
+        """Initialise the main window"""
         super().__init__(parent)
 
         self.stacked_widget = QtWidgets.QStackedWidget()
@@ -56,12 +40,14 @@ class Window(QtWidgets.QMainWindow):
         
 
     def register(self, widget, name):
+        """Register a widget to the stacked_widget of the main window"""
         self.m_pages[name] = widget
         self.stacked_widget.addWidget(widget)
     
 
     @QtCore.pyqtSlot(str)
     def goto(self, name):
+        """Switch main page view to given widget view"""
         if name in self.m_pages:
             widget = self.m_pages[name]
             self.stacked_widget.setCurrentWidget(widget)
