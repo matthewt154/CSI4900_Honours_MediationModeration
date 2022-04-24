@@ -34,6 +34,7 @@ def create_brain_data(img_data, mask):
     return np.array(brain_data)
 
 # Filepath to use
+# Change to filepath you want to use
 filepath = "example_output.json"
 
 # Get data from Json
